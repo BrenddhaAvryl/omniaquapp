@@ -38,3 +38,4 @@ export function calcularTempoAcionamentoMs(volumeMl, vazaoMlMin = 60.0) {
 
   return Math.max(tempoCalculado, TEMPO_MIN_ACIONAMENTO_MS);
 }
+

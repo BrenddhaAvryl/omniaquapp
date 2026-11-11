@@ -1,4 +1,8 @@
 export default class PumpService {
+  constructor(apiUrl = "http://localhost:3000/api") {
+    this.apiUrl = apiUrl;
+  }
+
   getPumps() {
     return [
       { id: 1, solucao: "Solução A", cor: "#74e3d2", volume: 5, horario: "08:00" },
@@ -19,7 +23,23 @@ export default class PumpService {
   async doseNow(id, volume) {
     this.validateDose(id, volume);
     const payload = { id_bomba: id, volume_ml: volume };
-    // Simula o envio assíncrono. A futura chamada fetch fica nesta camada.
+
+    try {
+      const resposta = await fetch(`${this.apiUrl}/bombas/${id}/dosar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ volume_ml: volume }),
+      });
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        console.log("[PumpService] Dose confirmada pela API:", dados);
+        return dados;
+      }
+    } catch {
+      // Backend offline: fallback automático para modo simulado
+      console.info("[PumpService] Backend offline: operando em modo de simulação local.");
+    }
+
     await Promise.resolve();
     console.log(payload);
     return payload;
@@ -31,6 +51,22 @@ export default class PumpService {
       throw new Error("Informe um horário válido no formato HH:MM.");
     }
     const payload = { id_bomba: id, volume_ml: volume, horario: time };
+
+    try {
+      const resposta = await fetch(`${this.apiUrl}/agendamentos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bomba_id: id, volume_ml: volume, horario: time }),
+      });
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        console.log("[PumpService] Agendamento registrado pela API:", dados);
+        return dados;
+      }
+    } catch {
+      console.info("[PumpService] Backend offline: operando em modo de simulação local.");
+    }
+
     await Promise.resolve();
     console.log(payload);
     return payload;

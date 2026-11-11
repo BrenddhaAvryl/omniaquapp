@@ -134,3 +134,4 @@ router.get("/historico", async (req, res) => {
 });
 
 export default router;
+

@@ -34,3 +34,4 @@ app.listen(port, async () => {
   // Inicia o motor de agendamentos em background
   inicializarAgendador();
 });
+

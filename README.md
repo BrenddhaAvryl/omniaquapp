@@ -34,12 +34,18 @@ Para uma análise aprofundada de requisitos, contratos de mensageria JSON e To-D
 ```text
 omniaquapp/
 ├── backend/
-│   └── database/
-│       └── schema.sql                # Script DDL do banco e seeds iniciais
+│   ├── database/
+│   │   └── schema.sql                # Script DDL do banco e seeds iniciais
+│   ├── scripts/
+│   │   └── simulate_esp8266.js       # Simulador MQTT da placa para testes sem hardware
+│   ├── src/                          # API REST, agendador cron e cliente MQTT
+│   ├── .env.example                  # Variáveis de ambiente
+│   └── package.json                  # Dependências do backend
 ├── firmware/
-│   └── omniaqua_esp8266/
-│       ├── omniaqua_esp8266.ino      # Firmware C++ completo (MQTT, ArduinoJson, millis)
-│       └── config.example.h          # Modelo de credenciais Wi-Fi e MQTT
+│   ├── omniaqua_esp8266/
+│   │   ├── omniaqua_esp8266.ino      # Firmware C++ completo (MQTT, ArduinoJson, millis)
+│   │   └── config.example.h          # Modelo de credenciais Wi-Fi e MQTT
+│   └── platformio.ini                # Configuração para desenvolvedores PlatformIO
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf            # Configuração do broker local Mosquitto
@@ -49,7 +55,7 @@ omniaquapp/
 │   ├── controllers/
 │   │   └── AppController.js          # Orquestrador de eventos e concorrência MVC
 │   ├── services/
-│   │   └── PumpService.js            # Camada de comunicação com a API REST
+│   │   └── PumpService.js            # Camada de comunicação com a API REST / Mock
 │   ├── views/
 │   │   ├── FeedbackView.js           # Feedback visual e toasts acessíveis
 │   │   ├── OceanView.js              # Animação marinha interativa em Canvas
@@ -70,7 +76,7 @@ omniaquapp/
 - [Git](https://git-scm.com/)
 - [Docker](https://www.docker.com/) e Docker Compose
 - [Node.js](https://nodejs.org/) (versão 18+)
-- [Arduino IDE](https://www.arduino.cc/) ou [PlatformIO](https://platformio.org/) (para o firmware)
+- [Arduino IDE](https://www.arduino.cc/) ou [PlatformIO](https://platformio.org/) (para quem for programar na placa)
 
 ---
 
@@ -88,32 +94,64 @@ Isso inicializa automaticamente:
 ---
 
 ### 3. Rodar o Frontend (Dashboard)
-Você pode servir a pasta estática com qualquer servidor HTTP local:
+Como o projeto utiliza **JavaScript Modular nativo (ES Modules com `type="module"`)**, os navegadores modernos bloqueiam a abertura direta por dois cliques no arquivo (`file:///`) por regras de segurança (CORS). É necessário rodar através de um servidor HTTP local:
 
+#### Opção A: VS Code (Recomendada / Mais Fácil - Sem Terminal)
+1. Instale a extensão oficial **[Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)** no seu VS Code.
+2. Clique com o botão direito sobre o arquivo [`index.html`](./index.html) e selecione **"Open with Live Server"**.
+3. O painel abrirá automaticamente em `http://localhost:5500` com recarregamento em tempo real (hot-reload).
+
+#### Opção B: Via Node.js (`npx serve`)
 ```bash
-# Opção 1: Via Python
+# Executa na porta 8000 (para não conflitar com a API na porta 3000)
+npx serve -l 8000 .
+```
+Acesse em: [http://localhost:8000](http://localhost:8000)
+
+#### Opção C: Via Python
+```bash
+# No Windows:
 python -m http.server 8000
 
-# Opção 2: Via Node.js npx
-npx serve .
+# No macOS ou Linux:
+python3 -m http.server 8000
 ```
-
-Abra seu navegador em [http://localhost:8000](http://localhost:8000).
+Acesse em: [http://localhost:8000](http://localhost:8000)
 
 ---
 
-### 4. Gravar o Firmware no ESP8266
+### 4. Rodar o Backend (API REST + Scheduler MQTT)
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+A API iniciará na porta `3000` conectando ao banco PostgreSQL e ao Mosquitto.
+
+---
+
+### 5. Testar sem a Placa Física (Simulador ESP8266)
+Se você estiver desenvolvendo a API ou a interface e não tiver a placa ESP8266 em mãos, execute o simulador em um terminal separado:
+
+```bash
+cd backend
+npm run simulate
+```
+O simulador conecta ao Mosquitto, recebe os comandos de dosagem via MQTT, emula o tempo da bomba ligada e responde com a confirmação (ACK) automaticamente!
+
+---
+
+### 6. Gravar o Firmware no ESP8266 Físico
 
 1. Acesse o diretório `firmware/omniaqua_esp8266/`.
 2. Duplique o arquivo `config.example.h` e renomeie a cópia para `config.h`:
    ```bash
    cp config.example.h config.h
    ```
-3. Abra o `config.h` e insira o SSID/senha do seu Wi-Fi e o IP do Broker MQTT (o arquivo `config.h` já está protegido pelo `.gitignore`).
-4. Abra `omniaqua_esp8266.ino` na Arduino IDE ou PlatformIO.
-5. Instale as bibliotecas necessárias:
-   - `PubSubClient` (por Nick O'Leary)
-   - `ArduinoJson` (v6 ou v7)
+3. Abra o `config.h` e insira o SSID/senha do seu Wi-Fi e o IP da sua máquina com o Broker MQTT (o arquivo `config.h` já está protegido pelo `.gitignore`).
+4. Abra `omniaqua_esp8266.ino` na Arduino IDE ou abra a pasta `firmware/` no PlatformIO.
+5. Bibliotecas necessárias: `PubSubClient` e `ArduinoJson` (já configuradas no `platformio.ini`).
 6. Conecte a placa via USB e faça o upload para a porta COM correspondente.
 
 ---
@@ -126,5 +164,4 @@ Abra seu navegador em [http://localhost:8000](http://localhost:8000).
 ---
 
 ## 📄 Licença
-Distribuído sob a licença [MIT](LICENSE). Consulte `LICENSE` para obter mais detalhes.
-
+Distribuído sob a licença [MIT](LICENSE).

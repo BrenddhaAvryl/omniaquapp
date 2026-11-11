@@ -26,3 +26,4 @@ export async function testDbConnection() {
     console.error("[PostgreSQL] Falha ao conectar ao banco de dados:", error.message);
   }
 }
+
