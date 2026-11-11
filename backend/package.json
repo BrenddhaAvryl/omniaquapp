@@ -1,0 +1,30 @@
+{
+  "name": "omniaqua-backend",
+  "version": "1.0.0",
+  "description": "API REST e Worker MQTT para dosador automatizado OmniAqua",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "iot",
+    "esp8266",
+    "mqtt",
+    "aquarium",
+    "dosing-pump",
+    "nodejs"
+  ],
+  "author": "OmniAqua Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mqtt": "^5.5.3",
+    "node-cron": "^3.0.3",
+    "pg": "^8.11.5",
+    "uuid": "^9.0.1"
+  }
+}

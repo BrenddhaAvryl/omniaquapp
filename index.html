@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OmniAqua | Painel de dosagem</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="fundo-marinho" aria-hidden="true">
+    <canvas class="anemona" width="380" height="210"></canvas>
+    <canvas class="anemona" width="380" height="210"></canvas>
+  </div>
+  <header>
+    <nav class="largura flex min-h-[72px] items-center justify-between gap-3" aria-label="Principal">
+      <a class="marca text-inherit no-underline" href="#painel"><i class="gota" aria-hidden="true"></i>Omni<span>Aqua</span></a>
+      <span class="online">Online</span>
+    </nav>
+  </header>
+  <main id="painel" class="largura">
+    <section class="capa" aria-labelledby="titulo">
+      <canvas id="oceano" aria-hidden="true"></canvas>
+      <h1 id="titulo" class="font-semibold">Painel de dosagem</h1>
+    </section>
+    <div id="bombas" class="grade" role="region" aria-label="Bombas peristálticas"></div>
+  </main>
+  <div id="aviso" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
