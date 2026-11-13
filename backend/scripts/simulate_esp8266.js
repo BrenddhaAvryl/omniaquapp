@@ -110,3 +110,4 @@ function enviarAck(comandoId, idBomba, status, tempoExecutadoMs) {
     }
   });
 }
+
